@@ -1,0 +1,205 @@
+/* Enter your custom styles here */
+/* ═══════════════════════════════════════════════
+   GST Purchase Register – Custom Stylesheet
+   ═══════════════════════════════════════════════ */
+
+/* ── Page ── */
+.gstPage {
+    background: #f4f6fa;
+}
+
+.gstPageHeader {
+    background: #ffffff !important;
+    border-bottom: 2px solid #d0e4f7 !important;
+    box-shadow: 0 2px 8px rgba(0, 100, 217, 0.08);
+}
+
+.gstPageTitle {
+    font-weight: 700 !important;
+    color: #1a2a40 !important;
+}
+
+/* ── Analyse button ── */
+.analyseBtn.sapMBtn .sapMBtnInner {
+    background: linear-gradient(135deg, #0057b8, #0078d4) !important;
+    border: none !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 6px rgba(0, 87, 184, 0.35) !important;
+}
+.analyseBtn.sapMBtn:hover .sapMBtnInner {
+    background: linear-gradient(135deg, #003e8a, #005fa3) !important;
+}
+
+/* ── AI Summary Panel ── */
+.aiSummaryPanel {
+    margin: 0.75rem 1rem 0.5rem 1rem;
+    border-radius: 10px !important;
+    border: 1px solid #b8d4f0 !important;
+    background: linear-gradient(135deg, #f0f6ff 0%, #e8f2fe 100%) !important;
+    box-shadow: 0 4px 16px rgba(0, 100, 217, 0.10) !important;
+    overflow: hidden;
+}
+
+.aiSummaryPanel > .sapMPanelHdr,
+.aiSummaryPanel .sapMITBHead {
+    background: rgba(0, 100, 217, 0.06) !important;
+    border-bottom: 1px solid #c8dcf0 !important;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.aiSummaryContent {
+    padding: 0.75rem 1rem 0.75rem 1rem;
+    gap: 0.4rem;
+}
+
+/* Metrics Row */
+.aiMetricsRow {
+    gap: 0.6rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #d0e4f5;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.aiMetricCard {
+    background: #ffffff;
+    border: 1px solid #d4e6f8;
+    border-radius: 8px;
+    padding: 0.55rem 1rem;
+    min-width: 130px;
+    box-shadow: 0 1px 4px rgba(0, 100, 217, 0.07);
+    transition: box-shadow 0.15s ease;
+}
+
+.aiMetricCard:hover {
+    box-shadow: 0 3px 10px rgba(0, 100, 217, 0.14);
+}
+
+.aiMetricLabel {
+    font-size: 0.68rem !important;
+    color: #6b7e9a !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600 !important;
+    display: block;
+    margin-bottom: 0.15rem;
+}
+
+.aiMetricValue .sapMTitle {
+    color: #0057b8 !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+}
+
+/* Insight rows */
+.aiInsightRow {
+    padding: 0.55rem 0.75rem;
+    border-radius: 6px;
+    gap: 0.6rem;
+    margin-bottom: 0.35rem;
+}
+
+.aiInsight-critical {
+    background: #fff3f3;
+    border-left: 3px solid #bb0000;
+}
+
+.aiInsight-warning {
+    background: #fff7ee;
+    border-left: 3px solid #c44500;
+}
+
+.aiInsight-info {
+    background: #f0f7ff;
+    border-left: 3px solid #0064d9;
+}
+
+.aiInsightIcon {
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+}
+
+.aiInsightText {
+    font-size: 0.85rem !important;
+    line-height: 1.55 !important;
+    color: #2c3a4a !important;
+}
+
+.aiTimestamp {
+    font-size: 0.72rem !important;
+    color: #8ca0b8 !important;
+    font-style: italic;
+    margin-top: 0.4rem;
+    display: block;
+}
+
+/* ── Filter Bar ── */
+.gstFilterPanel {
+    margin: 0.5rem 1rem 0.5rem 1rem !important;
+    border-radius: 8px !important;
+    border: 1px solid #e0e8f2 !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.gstFilterRow {
+    padding: 0.6rem 1rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.gstFilterItem {
+    gap: 0.2rem;
+}
+
+.gstFilterItem .sapMLabel {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: #4a5568 !important;
+}
+
+.gstFilterBtns {
+    gap: 0.4rem;
+    padding-bottom: 0.05rem;
+}
+
+/* ── Info bar ── */
+.gstInfoBar {
+    padding: 0.3rem 1.25rem 0.2rem 1.25rem;
+}
+
+.gstRecordCount {
+    font-size: 0.78rem !important;
+    color: #6b7e9a !important;
+    font-weight: 500;
+}
+
+/* ── Main Table ── */
+.gstMainTable {
+    margin: 0 1rem 1rem 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #d8e6f2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.gstMainTable .sapUiTableColHdrCnt {
+    background: #f0f5fb !important;
+    border-bottom: 2px solid #c8d8ea !important;
+}
+
+.gstMainTable .sapUiTableColCell {
+    font-weight: 600 !important;
+    font-size: 0.78rem !important;
+    color: #2c3a4a !important;
+}
+
+.gstMainTable .sapUiTableDataCell {
+    font-size: 0.8rem !important;
+    color: #32404f !important;
+}
+
+.gstMainTable .sapUiTableRowAlternate .sapUiTableCellInner {
+    background: #f9fbfd !important;
+}
