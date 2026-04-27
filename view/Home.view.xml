@@ -7,7 +7,6 @@
 
     <Page id="page" showNavButton="false" class="sapUiNoContentPadding gstPage">
 
-        <!-- ── Custom Header Bar ─────────────────────────── -->
         <customHeader>
             <Bar class="gstPageHeader">
                 <contentLeft>
@@ -32,21 +31,32 @@
 
         <content>
 
-            <!-- ── AI Executive Summary Panel (hidden by default) ── -->
+            <!-- AI Executive Summary Panel -->
             <Panel id="aiSummaryPanel" visible="false" class="aiSummaryPanel">
                 <headerToolbar>
                     <Toolbar height="2.5rem">
                         <core:Icon src="sap-icon://ai" size="1rem" color="#0064d9" class="sapUiTinyMarginEnd"/>
                         <Title text="AI Executive Summary" titleStyle="H6"/>
                         <ToolbarSpacer/>
-                        <Button icon="sap-icon://decline" type="Transparent"
-                            tooltip="Close" press="onCloseAnalysis"/>
+                        <Button icon="sap-icon://decline" type="Transparent" tooltip="Close" press="onCloseAnalysis"/>
                     </Toolbar>
                 </headerToolbar>
                 <VBox id="aiSummaryContent" class="aiSummaryContent"/>
             </Panel>
 
-            <!-- ── Filter Bar ──────────────────────────────────── -->
+            <!-- Active Drill-Down Badge (hidden by default) -->
+            <HBox id="drillDownBadgeBar" visible="false" alignItems="Center" class="drillDownBadgeBar">
+                <core:Icon src="sap-icon://filter" size="0.85rem" color="#0064d9" class="sapUiTinyMarginEnd"/>
+                <Text id="drillDownBadgeText" text="" class="drillDownBadgeText"/>
+                <Button id="drillDownClearBtn"
+                    text="Clear Filter"
+                    icon="sap-icon://sys-cancel"
+                    type="Transparent"
+                    press="onClearDrillDown"
+                    class="drillDownClearBtn"/>
+            </HBox>
+
+            <!-- Filter Bar -->
             <Panel class="gstFilterPanel">
                 <HBox wrap="Wrap" alignItems="End" class="gstFilterRow">
                     <VBox class="gstFilterItem">
@@ -89,13 +99,12 @@
                 </HBox>
             </Panel>
 
-            <!-- ── Record Info Bar ─────────────────────────────── -->
-            <HBox alignItems="Center" justifyContent="SpaceBetween"
-                class="gstInfoBar">
+            <!-- Record Info Bar -->
+            <HBox alignItems="Center" justifyContent="SpaceBetween" class="gstInfoBar">
                 <Text id="txtRecordCount" text="Loading..." class="gstRecordCount"/>
             </HBox>
 
-            <!-- ── Main Data Table ─────────────────────────────── -->
+            <!-- Main Table -->
             <t:Table
                 id="gstTable"
                 visibleRowCount="15"

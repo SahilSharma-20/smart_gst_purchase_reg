@@ -1,2 +1,0 @@
-sap.ui.define(["gstpr/zfigstpregister/controller/Home.controller"],function(t){"use strict";QUnit.module("Home Controller");QUnit.test("I should test the Home controller",function(e){var o=new t;o.onInit();e.ok(o)})});
-//# sourceMappingURL=Home.controller.js.map

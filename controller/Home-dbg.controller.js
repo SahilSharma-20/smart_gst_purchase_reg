@@ -120,12 +120,11 @@ sap.ui.define([
 
     return Controller.extend("gstpr.zfigstpregister.controller.Home", {
 
-        // ────────────────────────────────────────────────────────────────
-        //  Lifecycle
-        // ────────────────────────────────────────────────────────────────
+        // ── Lifecycle ──────────────────────────────────────────────────
         onInit: function () {
             this._oGstModel      = new JSONModel();
             this._oAnalysisModel = new JSONModel();
+            this._oActiveDrillFilter = null; // track active drill-down filter
 
             this.getView().setModel(this._oGstModel,      "gstData");
             this.getView().setModel(this._oAnalysisModel, "gstAnalysis");
@@ -134,11 +133,8 @@ sap.ui.define([
             this._loadAnalysis();
         },
 
-        // ────────────────────────────────────────────────────────────────
-        //  Data loading  (fixed URL via sap.ui.require.toUrl)
-        // ────────────────────────────────────────────────────────────────
+        // ── Data loading ───────────────────────────────────────────────
         _loadData: function () {
-            // toUrl with full module path is the reliable way in any UI5 setup
             var sUrl = sap.ui.require.toUrl(
                 "gstpr/zfigstpregister/model/data/gst_data.json"
             );
@@ -155,31 +151,16 @@ sap.ui.define([
             var sUrl = sap.ui.require.toUrl(
                 "gstpr/zfigstpregister/model/data/gst_analysis.json"
             );
-            this._oAnalysisModel.loadData(sUrl).catch(function () {
-                // silently ignore — analysis panel will show a friendly message
-            });
+            this._oAnalysisModel.loadData(sUrl).catch(function () {});
         },
 
-        // _onDataLoaded: function () {
-        //     this._buildTable();
-        //     this._populateFilterDropdowns();
-        //     this._updateRecordCount();
-        // },
         _onDataLoaded: function () {
-    this._buildTable();
-    this._populateFilterDropdowns();
-    this._updateRecordCount();
+            this._buildTable();
+            this._populateFilterDropdowns();
+            this._updateRecordCount();
+        },
 
-    // ✅ FIX: force UI5 table to render properly
-    var oTable = this.byId("gstTable");
-    setTimeout(function () {
-        oTable.rerender();
-    }, 0);
-},
-
-        // ────────────────────────────────────────────────────────────────
-        //  Build table columns programmatically
-        // ────────────────────────────────────────────────────────────────
+        // ── Build table ────────────────────────────────────────────────
         _buildTable: function () {
             var oTable = this.byId("gstTable");
             oTable.destroyColumns();
@@ -202,15 +183,13 @@ sap.ui.define([
             oTable.bindRows("gstData>/data");
         },
 
-        // ────────────────────────────────────────────────────────────────
-        //  Populate filter dropdowns
-        // ────────────────────────────────────────────────────────────────
+        // ── Populate dropdowns ─────────────────────────────────────────
         _populateFilterDropdowns: function () {
             var aData = this._oGstModel.getProperty("/data") || [];
 
             var fnFill = function (sId, sField) {
-                var oCombo  = this.byId(sId);
-                var aVals   = Array.from(
+                var oCombo = this.byId(sId);
+                var aVals  = Array.from(
                     new Set(
                         aData
                             .map(function (r) { return String(r[sField] || ""); })
@@ -227,44 +206,38 @@ sap.ui.define([
             fnFill("filterBusinessPlace", "Business Place");
         },
 
-        // ────────────────────────────────────────────────────────────────
-        //  Record count
-        // ────────────────────────────────────────────────────────────────
+        // ── Record count ───────────────────────────────────────────────
         _updateRecordCount: function () {
             var oBinding = this.byId("gstTable").getBinding("rows");
             var iTotal   = (this._oGstModel.getProperty("/data") || []).length;
             var iShown   = oBinding ? oBinding.getLength() : iTotal;
             this.byId("txtRecordCount").setText(
                 "Showing " + iShown.toLocaleString("en-IN") +
-                " of "     + iTotal.toLocaleString("en-IN") + " records"
+                " of " + iTotal.toLocaleString("en-IN") + " records"
             );
         },
 
-        // ────────────────────────────────────────────────────────────────
-        //  Filters
-        // ────────────────────────────────────────────────────────────────
+        // ── Filter bar: Go ─────────────────────────────────────────────
         onGo: function () {
+            // clear any active drill-down when user manually filters
+            this._clearDrillDownBadge();
+            this._applyFilterBarFilters();
+        },
+
+        _applyFilterBarFilters: function () {
             var aFilters = [];
 
             var sCC = this.byId("filterCompanyCode").getSelectedKey();
-            if (sCC) {
-                aFilters.push(new Filter("Company Code", FilterOperator.EQ, sCC));
-            }
+            if (sCC) aFilters.push(new Filter("Company Code", FilterOperator.EQ, sCC));
 
             var sDocNo = this.byId("filterDocNo").getValue().trim();
-            if (sDocNo) {
-                aFilters.push(new Filter("Doc No", FilterOperator.Contains, sDocNo));
-            }
+            if (sDocNo) aFilters.push(new Filter("Doc No", FilterOperator.Contains, sDocNo));
 
             var sBA = this.byId("filterBusinessArea").getSelectedKey();
-            if (sBA) {
-                aFilters.push(new Filter("Business Area", FilterOperator.EQ, sBA));
-            }
+            if (sBA) aFilters.push(new Filter("Business Area", FilterOperator.EQ, sBA));
 
             var sBP = this.byId("filterBusinessPlace").getSelectedKey();
-            if (sBP) {
-                aFilters.push(new Filter("Business Place", FilterOperator.EQ, sBP));
-            }
+            if (sBP) aFilters.push(new Filter("Business Place", FilterOperator.EQ, sBP));
 
             var sFrom = this.byId("filterDateFrom").getValue();
             var sTo   = this.byId("filterDateTo").getValue();
@@ -279,14 +252,13 @@ sap.ui.define([
             var oBinding = this.byId("gstTable").getBinding("rows");
             if (oBinding) {
                 oBinding.filter(
-                    aFilters.length
-                        ? new Filter({ filters: aFilters, and: true })
-                        : []
+                    aFilters.length ? new Filter({ filters: aFilters, and: true }) : []
                 );
                 setTimeout(this._updateRecordCount.bind(this), 150);
             }
         },
 
+        // ── Filter bar: Reset ──────────────────────────────────────────
         onReset: function () {
             this.byId("filterCompanyCode").setSelectedKey("");
             this.byId("filterDocNo").setValue("");
@@ -294,6 +266,7 @@ sap.ui.define([
             this.byId("filterBusinessPlace").setSelectedKey("");
             this.byId("filterDateFrom").setValue("");
             this.byId("filterDateTo").setValue("");
+            this._clearDrillDownBadge();
 
             var oBinding = this.byId("gstTable").getBinding("rows");
             if (oBinding) {
@@ -302,14 +275,11 @@ sap.ui.define([
             }
         },
 
-        // ────────────────────────────────────────────────────────────────
-        //  AI Summary
-        // ────────────────────────────────────────────────────────────────
+        // ── AI Summary: open/close ─────────────────────────────────────
         onAnalyse: function () {
             var oPanel = this.byId("aiSummaryPanel");
-            var bShow  = !oPanel.getVisible();
-            oPanel.setVisible(bShow);
-            if (bShow) {
+            oPanel.setVisible(!oPanel.getVisible());
+            if (oPanel.getVisible()) {
                 this._renderAnalysis();
             }
         },
@@ -318,14 +288,16 @@ sap.ui.define([
             this.byId("aiSummaryPanel").setVisible(false);
         },
 
-        // ── KEY FIX: no "class:" in constructors — use addStyleClass() ──
+        // ── AI Summary: render ─────────────────────────────────────────
         _renderAnalysis: function () {
             var oContainer = this.byId("aiSummaryContent");
             oContainer.destroyItems();
 
             var oData = this._oAnalysisModel.getData();
             if (!oData || !oData.insights || !oData.insights.length) {
-                var oMsg = new Text({ text: "No analysis found. Run scripts/analyze_gst_data.py to generate insights." });
+                var oMsg = new Text({
+                    text: "No analysis found. Run scripts/analyze_gst_data.py to generate insights."
+                });
                 oMsg.addStyleClass("sapUiSmallMargin");
                 oContainer.addItem(oMsg);
                 return;
@@ -351,19 +323,17 @@ sap.ui.define([
             aKpi.forEach(function (oK) {
                 var oLbl = new Label({ text: oK.label });
                 oLbl.addStyleClass("aiMetricLabel");
-
                 var oVal = new Title({ text: oK.value, titleStyle: "H6" });
                 oVal.addStyleClass("aiMetricValue");
-
                 var oCard = new VBox({ items: [oLbl, oVal] });
                 oCard.addStyleClass("aiMetricCard");
-
                 oMetricsRow.addItem(oCard);
             });
 
             oContainer.addItem(oMetricsRow);
 
-            // ── Insight bullets ─────────────────────────────────────────
+            // ── Insight bullets — now clickable ─────────────────────────
+            var that = this;
             oData.insights.forEach(function (oI) {
                 var sIconSrc = oI.severity === "critical" ? "sap-icon://error"
                              : oI.severity === "warning"  ? "sap-icon://warning2"
@@ -378,9 +348,28 @@ sap.ui.define([
                 var oTxt = new Text({ text: oI.text });
                 oTxt.addStyleClass("aiInsightText");
 
-                var oRow = new HBox({ alignItems: "Start", items: [oIcon, oTxt] });
+                // Drill-down arrow indicator (only for insights with a filter)
+                var oDrillHint = new Text({ text: "↗ Click to view records" });
+                oDrillHint.addStyleClass("aiInsightDrillHint");
+
+                var oTextBox = new VBox({ items: [oTxt, oDrillHint] });
+
+                var oRow = new HBox({ alignItems: "Start", items: [oIcon, oTextBox] });
                 oRow.addStyleClass("aiInsightRow");
                 oRow.addStyleClass("aiInsight-" + oI.severity);
+
+                // Make clickable if insight has filterParams
+                if (oI.filterParams && oI.filterId) {
+                    oRow.addStyleClass("aiInsightClickable");
+                    // Capture oI in closure
+                    (function (oInsight) {
+                        oRow.attachBrowserEvent("click", function () {
+                            that._applyDrillDown(oInsight);
+                        });
+                    })(oI);
+                } else {
+                    oDrillHint.setVisible(false);
+                }
 
                 oContainer.addItem(oRow);
             });
@@ -393,9 +382,106 @@ sap.ui.define([
             }
         },
 
-        // ────────────────────────────────────────────────────────────────
-        //  Column Settings
-        // ────────────────────────────────────────────────────────────────
+        // ── DRILL-DOWN: build and apply filter from insight ────────────
+        _applyDrillDown: function (oInsight) {
+            var oParams  = oInsight.filterParams;
+            var sField   = oParams.field;
+            var oFilter  = null;
+            var aData    = this._oGstModel.getProperty("/data") || [];
+
+            switch (oParams.operator) {
+                case "isEmpty":
+                    // Client-side: collect keys of matching records
+                    var aEmpty = aData
+                        .filter(function (r) {
+                            var v = String(r[sField] || "").trim();
+                            return v === "" || v === "nan" || v === "0";
+                        })
+                        .map(function (r) { return r["Doc No"]; });
+
+                    // Use OR filter across matching Doc Nos
+                    if (aEmpty.length) {
+                        var aDocFilters = aEmpty.map(function (docNo) {
+                            return new Filter("Doc No", FilterOperator.EQ, String(docNo));
+                        });
+                        oFilter = new Filter({ filters: aDocFilters, and: false });
+                    }
+                    break;
+
+                case "notEmpty":
+                    var aNotEmpty = aData
+                        .filter(function (r) {
+                            var v = String(r[sField] || "").trim();
+                            return v !== "" && v !== "nan" && v !== "0";
+                        })
+                        .map(function (r) { return r["Doc No"]; });
+
+                    if (aNotEmpty.length) {
+                        var aNotDocFilters = aNotEmpty.map(function (docNo) {
+                            return new Filter("Doc No", FilterOperator.EQ, String(docNo));
+                        });
+                        oFilter = new Filter({ filters: aNotDocFilters, and: false });
+                    }
+                    break;
+
+                case "EQ":
+                    oFilter = new Filter(sField, FilterOperator.EQ, oParams.value);
+                    break;
+
+                case "GT":
+                    oFilter = new Filter(sField, FilterOperator.GT, parseFloat(oParams.value));
+                    break;
+
+                case "IN":
+                    var aInFilters = (oParams.values || []).map(function (v) {
+                        return new Filter(sField, FilterOperator.EQ, v);
+                    });
+                    if (aInFilters.length) {
+                        oFilter = new Filter({ filters: aInFilters, and: false });
+                    }
+                    break;
+
+                default:
+                    oFilter = null;
+            }
+
+            var oBinding = this.byId("gstTable").getBinding("rows");
+            if (oBinding && oFilter) {
+                oBinding.filter(oFilter);
+                this._oActiveDrillFilter = oFilter;
+                this._showDrillDownBadge(oInsight.filterLabel);
+                setTimeout(this._updateRecordCount.bind(this), 150);
+
+                // Scroll table into view smoothly
+                var oDomTable = this.byId("gstTable").getDomRef();
+                if (oDomTable) {
+                    oDomTable.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }
+        },
+
+        // ── DRILL-DOWN: badge bar ──────────────────────────────────────
+        _showDrillDownBadge: function (sLabel) {
+            this.byId("drillDownBadgeBar").setVisible(true);
+            this.byId("drillDownBadgeText").setText("Filtered: " + sLabel);
+        },
+
+        _clearDrillDownBadge: function () {
+            this.byId("drillDownBadgeBar").setVisible(false);
+            this.byId("drillDownBadgeText").setText("");
+            this._oActiveDrillFilter = null;
+        },
+
+        onClearDrillDown: function () {
+            this._clearDrillDownBadge();
+            var oBinding = this.byId("gstTable").getBinding("rows");
+            if (oBinding) {
+                oBinding.filter([]);
+                setTimeout(this._updateRecordCount.bind(this), 150);
+            }
+        },
+
+        // ── Column Settings ────────────────────────────────────────────
         onColumnSettings: function () {
             if (!this._oColDialog) {
                 this._buildColDialog();
@@ -446,9 +532,7 @@ sap.ui.define([
             var aCols = this.byId("gstTable").getColumns();
             _aColumnDefs.forEach(function (oDef, i) {
                 var oCb = this.byId("colCb_" + i);
-                if (oCb && aCols[i]) {
-                    oCb.setSelected(aCols[i].getVisible());
-                }
+                if (oCb && aCols[i]) oCb.setSelected(aCols[i].getVisible());
             }.bind(this));
         },
 
@@ -456,9 +540,7 @@ sap.ui.define([
             var aCols = this.byId("gstTable").getColumns();
             _aColumnDefs.forEach(function (oDef, i) {
                 var oCb = this.byId("colCb_" + i);
-                if (oCb && aCols[i]) {
-                    aCols[i].setVisible(oCb.getSelected());
-                }
+                if (oCb && aCols[i]) aCols[i].setVisible(oCb.getSelected());
             }.bind(this));
             MessageToast.show("Column visibility updated.");
         }

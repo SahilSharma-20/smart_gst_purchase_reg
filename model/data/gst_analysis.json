@@ -1,5 +1,5 @@
 {
-  "generatedAt": "27 Apr 2026, 06:49:03",
+  "generatedAt": "27 Apr 2026, 14:00:32",
   "metrics": {
     "totalRecords": 1213,
     "totalInvoiceValue": 1884479734.1,
@@ -27,30 +27,82 @@
   "insights": [
     {
       "severity": "critical",
+      "filterId": "missing_gstin",
+      "filterLabel": "10 invoices — Missing Vendor GSTIN",
+      "filterParams": {
+        "field": "Vendor GSTIN",
+        "operator": "isEmpty"
+      },
       "text": "10 invoice lines have no Vendor GSTIN on record (invoice value: ₹102.01 Cr). These will not appear in GSTR-2B auto-population and risk ITC denial during GST reconciliation. Obtain GSTINs from vendors immediately."
     },
     {
       "severity": "critical",
+      "filterId": "itc_no",
+      "filterLabel": "681 records — ITC Non-Eligible",
+      "filterParams": {
+        "field": "ITC Eligibility",
+        "operator": "EQ",
+        "value": "No"
+      },
       "text": "681 records (56.1%) are ITC Non-Eligible — representing ₹5.86 Cr of non-recoverable input tax that will flow to P&L as cost. This exceeds half the register volume; review procurement categories to confirm correct ITC treatment."
     },
     {
       "severity": "info",
+      "filterId": "top3_vendors",
+      "filterLabel": "Top 3 vendors by purchase value",
+      "filterParams": {
+        "field": "Vendor name",
+        "operator": "IN",
+        "values": [
+          "JINDAL STEEL & POWER LIMITED",
+          "JINDAL STEEL & POWER LIMITED II",
+          "RHI MAGNESITA GMBH"
+        ]
+      },
       "text": "Top 3 vendors represent 29.6% (₹55.83 Cr) of total purchase value — vendor mix is reasonably diversified. Vendors: JINDAL STEEL & POWER LIMITED (₹35.25 Cr); JINDAL STEEL & POWER LIMITED II (₹15.46 Cr); RHI MAGNESITA GMBH (₹5.11 Cr)."
     },
     {
       "severity": "info",
+      "filterId": "igst_heavy",
+      "filterLabel": "Records with IGST amount > 0",
+      "filterParams": {
+        "field": "IGST Amount",
+        "operator": "GT",
+        "value": "0"
+      },
       "text": "Tax composition: IGST ₹5.86 Cr (59.2%), CGST ₹2.02 Cr (20.4%), SGST ₹2.02 Cr (20.4%). Tax type mix between inter-state (IGST) and intra-state (CGST/SGST) looks balanced."
     },
     {
       "severity": "warning",
+      "filterId": "capital_goods",
+      "filterLabel": "113 Capital Goods lines",
+      "filterParams": {
+        "field": "Goods/Services",
+        "operator": "EQ",
+        "value": "CAPITAL"
+      },
       "text": "Purchase mix: Goods 846 lines (₹86.21 Cr), Services 253 lines (₹2.44 Cr), Capital Goods 113 lines (₹5.58 Cr, tax ₹74.82 L). Capital goods ITC (₹74.82 L) must be availed in 60 equal monthly instalments — track separately in TRAN/ITC ledger."
     },
     {
       "severity": "info",
+      "filterId": "top_bp",
+      "filterLabel": "Business Place 'IN06' records",
+      "filterParams": {
+        "field": "Business Place",
+        "operator": "EQ",
+        "value": "IN06"
+      },
       "text": "Business Place 'IN06' has the highest purchase volume at ₹37.38 Cr (19.8% of total) across 7 active business places. Ensure GST state registrations and filing calendars are current for all locations."
     },
     {
       "severity": "info",
+      "filterId": "itc_yes",
+      "filterLabel": "531 ITC-Eligible records",
+      "filterParams": {
+        "field": "ITC Eligibility",
+        "operator": "EQ",
+        "value": "Yes"
+      },
       "text": "Blended effective tax rate is 18.51% on a taxable base of ₹86.24 Cr (total tax: ₹15.96 Cr). ITC recovery rate is 43.8% — 531 of 1,213 records are ITC-eligible. Maximising eligible ITC is key to reducing net GST outflow."
     }
   ]
